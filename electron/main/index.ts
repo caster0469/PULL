@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,8 +15,10 @@ const isDevelopment = !app.isPackaged;
 let mainWindow: BrowserWindow | null = null;
 
 async function createWindow(): Promise<void> {
+  const workArea = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
-    title: 'PULL', width: 1440, height: 860, minWidth: 1040, minHeight: 680,
+    title: 'PULL', width: Math.min(1400, workArea.width), height: Math.min(850, workArea.height),
+    minWidth: Math.min(960, workArea.width), minHeight: Math.min(640, workArea.height),
     backgroundColor: '#e8e8e6',
     webPreferences: {
       // Sandboxed preload scripts must be CommonJS. TypeScript emits index.cts as index.cjs.
@@ -88,9 +90,9 @@ function registerIpcHandlers(): void {
   ipcMain.handle('file:show', (_event, value: string) => shell.showItemInFolder(safePath(value)));
   ipcMain.handle('app:status', async () => ({
     appVersion: app.getVersion(),
-    ytDlp: await binaries.version('yt-dlp'),
-    ffmpeg: await binaries.version('ffmpeg'),
-    ffprobe: await binaries.version('ffprobe'),
+    ytDlp: await binaries.check('yt-dlp'),
+    ffmpeg: await binaries.check('ffmpeg'),
+    ffprobe: await binaries.check('ffprobe'),
   }));
 }
 
