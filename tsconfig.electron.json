@@ -1,1 +1,1 @@
-{"compilerOptions":{"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","outDir":"dist-electron","rootDir":".","strict":true,"esModuleInterop":true,"skipLibCheck":true,"types":["node"]},"include":["electron/**/*.ts","shared/**/*.ts"]}
+{"compilerOptions":{"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","outDir":"dist-electron","rootDir":".","strict":true,"esModuleInterop":true,"skipLibCheck":true,"types":["node"]},"include":["electron/**/*.ts","electron/**/*.cts","shared/**/*.ts"]}

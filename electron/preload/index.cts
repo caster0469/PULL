@@ -21,3 +21,5 @@ const api: PullAPI = {
 };
 
 contextBridge.exposeInMainWorld('pull', api);
+
+console.info('[preload] window.pull API exposed');
