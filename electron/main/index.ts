@@ -18,7 +18,7 @@ async function createWindow(): Promise<void> {
     title: 'PULL', width: 1440, height: 860, minWidth: 1040, minHeight: 680,
     backgroundColor: '#e8e8e6',
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.cjs'),
+      preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
