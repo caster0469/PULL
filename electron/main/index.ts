@@ -10,7 +10,8 @@ import { YtDlpService } from '../services/YtDlpService.js';
 import type { DownloadRequest } from '../../shared/types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const devServerUrl = process.env.VITE_DEV_SERVER_URL;
+const DEFAULT_DEV_SERVER_URL = 'http://127.0.0.1:5173/';
+const isDevelopment = !app.isPackaged;
 let mainWindow: BrowserWindow | null = null;
 
 async function createWindow(): Promise<void> {
@@ -18,22 +19,40 @@ async function createWindow(): Promise<void> {
     title: 'PULL', width: 1440, height: 860, minWidth: 1040, minHeight: 680,
     backgroundColor: '#e8e8e6',
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
+      // Sandboxed preload scripts must be CommonJS. TypeScript emits index.cts as index.cjs.
+      preload: path.join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
     },
   });
 
-  mainWindow.webContents.on('did-fail-load', (_event, code, description, url) => {
-    console.error(`[electron] Failed to load ${url}: ${description} (${code})`);
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+    console.error('[electron] Renderer failed to load:', { errorCode, errorDescription, validatedURL });
   });
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.error('[electron] Renderer process gone:', details);
+  });
+  if (isDevelopment) {
+    mainWindow.webContents.on('did-finish-load', () => {
+      console.info(`[electron] Renderer loaded: ${mainWindow?.webContents.getURL()}`);
+    });
+    mainWindow.webContents.on('console-message', (_event, level, message, lineNumber, sourceId) => {
+      const log = level >= 3 ? console.error : level === 2 ? console.warn : console.info;
+      log(`[renderer] ${message} (${sourceId}:${lineNumber})`);
+    });
+  }
   mainWindow.on('closed', () => { mainWindow = null; });
 
-  if (!app.isPackaged && devServerUrl) {
+  if (isDevelopment) {
+    const devServerUrl = process.env.VITE_DEV_SERVER_URL ?? DEFAULT_DEV_SERVER_URL;
+    console.info(`[electron] Loading renderer from ${devServerUrl}`);
     await mainWindow.loadURL(devServerUrl);
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
-    await mainWindow.loadFile(path.join(__dirname, '../../dist/index.html'));
+    const rendererPath = path.join(__dirname, '../../../dist/index.html');
+    console.info(`[electron] Loading renderer from ${rendererPath}`);
+    await mainWindow.loadFile(rendererPath);
   }
 }
 
