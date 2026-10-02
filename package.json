@@ -5,7 +5,10 @@
   "main": "dist-electron/main/index.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k \"vite\" \"tsc -p tsconfig.electron.json --watch\" \"wait-on tcp:5173 dist-electron/main/index.js && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "dev": "concurrently --kill-others --names renderer,electron-ts,electron \"npm:dev:renderer\" \"npm:dev:electron:watch\" \"npm:dev:electron:start\"",
+    "dev:renderer": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "dev:electron:watch": "tsc -p tsconfig.electron.json --watch --preserveWatchOutput",
+    "dev:electron:start": "wait-on http-get://127.0.0.1:5173 dist-electron/main/index.js dist-electron/preload/index.cjs && cross-env VITE_DEV_SERVER_URL=http://localhost:5173/ electron .",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
     "lint": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
     "build": "npm run typecheck && vite build && tsc -p tsconfig.electron.json",
@@ -14,8 +17,8 @@
     "package:win": "npm run build && electron-builder --win",
     "package:linux": "npm run build && electron-builder --linux"
   },
-  "dependencies": {"@vitejs/plugin-react":"latest","vite":"latest","typescript":"latest","electron":"latest","electron-builder":"latest","react":"latest","react-dom":"latest","lucide-react":"latest"},
-  "devDependencies": {"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","concurrently":"latest","cross-env":"latest","wait-on":"latest"},
+  "dependencies": {"react":"latest","react-dom":"latest","lucide-react":"latest"},
+  "devDependencies": {"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","@vitejs/plugin-react":"latest","concurrently":"latest","cross-env":"latest","electron":"latest","electron-builder":"latest","typescript":"latest","vite":"latest","wait-on":"latest"},
   "build": {
     "appId": "com.pull.downloader", "productName": "PULL", "artifactName": "PULL-${version}-${os}-${arch}.${ext}",
     "files": ["dist/**/*", "dist-electron/**/*", "package.json"],
