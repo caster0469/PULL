@@ -1,0 +1,2 @@
+import fs from 'node:fs'; import path from 'node:path';
+export class JsonStore<T>{constructor(private file:string,private fallback:T){} read():T{try{return JSON.parse(fs.readFileSync(this.file,'utf8')) as T}catch{return this.fallback}} write(value:T){fs.mkdirSync(path.dirname(this.file),{recursive:true});const tmp=this.file+'.tmp';fs.writeFileSync(tmp,JSON.stringify(value,null,2));fs.renameSync(tmp,this.file)}}
