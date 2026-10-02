@@ -1,5 +1,10 @@
 # Bundled binaries
 
-Place `yt-dlp`, `ffmpeg`, and `ffprobe` (with `.exe` on Windows) in one of:
-`darwin-arm64`, `darwin-x64`, `win32-arm64`, `win32-x64`, `linux-arm64`, or `linux-x64`.
-Development uses `PATH`; packaged builds resolve this platform/architecture directory.
+`npm run stage:binaries` copies the platform-specific executables supplied by
+`@ffmpeg-installer/ffmpeg` and `@ffprobe-installer/ffprobe` into
+`<platform>-<arch>/`. Packaging runs this automatically and `extraResources`
+copies this tree outside ASAR to `process.resourcesPath/binaries`.
+
+Development resolves the same dependency executables directly. Packaged builds
+never consult `PATH`. Keep `yt-dlp` in each target directory until its installer
+is similarly managed.

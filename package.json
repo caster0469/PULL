@@ -13,18 +13,60 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
     "lint": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
     "build": "npm run typecheck && vite build && npm run build:electron",
-    "package": "npm run build && electron-builder",
-    "package:mac": "npm run build && electron-builder --mac",
-    "package:win": "npm run build && electron-builder --win",
-    "package:linux": "npm run build && electron-builder --linux"
+    "package": "npm run stage:binaries && npm run build && electron-builder",
+    "package:mac": "npm run stage:binaries && npm run build && electron-builder --mac",
+    "package:win": "npm run stage:binaries && npm run build && electron-builder --win",
+    "package:linux": "npm run stage:binaries && npm run build && electron-builder --linux",
+    "stage:binaries": "node scripts/stage-binaries.mjs"
   },
-  "dependencies": {"react":"latest","react-dom":"latest","lucide-react":"latest"},
-  "devDependencies": {"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","@vitejs/plugin-react":"latest","concurrently":"latest","cross-env":"latest","electron":"latest","electron-builder":"latest","typescript":"latest","vite":"latest","wait-on":"latest"},
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest",
+    "lucide-react": "latest",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "concurrently": "latest",
+    "cross-env": "latest",
+    "electron": "latest",
+    "electron-builder": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "wait-on": "latest"
+  },
   "build": {
-    "appId": "com.pull.downloader", "productName": "PULL", "artifactName": "PULL-${version}-${os}-${arch}.${ext}",
-    "files": ["dist/**/*", "dist-electron/**/*", "package.json"],
-    "extraResources": [{"from":"resources/binaries","to":"binaries","filter":["**/*"]}],
-    "mac": {"target":"dmg","category":"public.app-category.utilities"},
-    "win": {"target":"nsis"}, "linux": {"target":"deb","category":"Utility"}
+    "appId": "com.pull.downloader",
+    "productName": "PULL",
+    "artifactName": "PULL-${version}-${os}-${arch}.${ext}",
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/binaries",
+        "to": "binaries",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "deb",
+      "category": "Utility"
+    }
   }
 }
